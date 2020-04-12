@@ -9,59 +9,78 @@ GAME RULES:
 
 */
 
-let scores, roundScore, activePlayer;
-scores = [0, 0]
-roundScore = 0;
-activePlayer = 0;
+let scores, roundScore, activePlayer, gamePlaying;
 
-// Hide dice at the beginning of the game
-document.querySelector('.dice').style.display = 'none';
-document.getElementById('score-0').textContent = '0';
-document.getElementById('current-0').textContent = '0';
-document.getElementById('score-1').textContent = '0';
-document.getElementById('current-0').textContent = '0';
+// initialize game
+init = () => {
+    scores = [0, 0]
+    roundScore = 0;
+    activePlayer = 0;
+
+    gamePlaying = true;
+
+    document.querySelector('.dice').style.display = 'none';
+    document.getElementById('score-0').textContent = '0';
+    document.getElementById('current-0').textContent = '0';
+    document.getElementById('score-1').textContent = '0';
+    document.getElementById('current-1').textContent = '0';
+    document.querySelector(`#name-0`).textContent = 'Player 1';
+    document.querySelector(`#name-1`).textContent = 'Player 2';
+    document.querySelector(`.player-0-panel`).classList.remove('active');
+    document.querySelector(`.player-1-panel`).classList.remove('active');
+    document.querySelector(`.player-0-panel`).classList.remove('winner');
+    document.querySelector(`.player-1-panel`).classList.remove('winner');
+    document.querySelector(`.player-0-panel`).classList.add('active');
+}
+
+
+init();
+
+document.querySelector('.btn-new').addEventListener('click', init);
 
 document.querySelector('.btn-roll').addEventListener('click', function () {
-    // Generate random number
-    let dice = Math.floor(Math.random() * 6) + 1;
-
-    // Display the dice result
-    document.querySelector(`#current-${activePlayer}`).textContent = dice;
-
-    // Display the DOMdice and show the corresponding random value;
-    let diceDOM = document.querySelector('.dice');
-    diceDOM.style.display = 'block';
-    diceDOM.src = `./images/dice-${dice}.png`;
-
-    // Update roundScore IF the score is not 1;
-    if (dice !== 1) {
-        roundScore += dice;
-        document.getElementById(`current-${activePlayer}`).textContent = roundScore;
-    } else {
-        //Nextplayer
-        nextPlayer();
+    if (gamePlaying) {
+        // Generate random number
+        let dice = Math.floor(Math.random() * 6) + 1;
+        // Display the dice result
+        document.querySelector(`#current-${activePlayer}`).textContent = dice;
+        // Display the DOMdice and show the corresponding random value;
+        let diceDOM = document.querySelector('.dice');
+        diceDOM.style.display = 'block';
+        diceDOM.src = `./images/dice-${dice}.png`;
+        // Update roundScore IF the score is not 1;
+        if (dice !== 1) {
+            roundScore += dice;
+            document.getElementById(`current-${activePlayer}`).textContent = roundScore;
+        } else {
+            //Nextplayer
+            nextPlayer();
+        }
     }
 });
 
-document.querySelector('.btn-hold').addEventListener('click', function () {
-    // add current score to Global score
-    scores[activePlayer] += roundScore;
-    //update the UI
-    document.getElementById(`score-${activePlayer}`).textContent = scores[activePlayer];
-    // check if player won the game
-    if (scores[activePlayer] >= 10) {
-        // Current player Won
-        document.querySelector('.dice').style.display = 'none';
-        document.querySelector(`#name-${activePlayer}`).textContent = 'winner!';
-        document.querySelector(`.player-${activePlayer}-panel`).classList.add('winner');
-        document.querySelector(`.player-${activePlayer}-panel`).classList.remove('active');
-    } else {
-        // Nextplayer
-        nextPlayer();
+document.querySelector('.btn-hold').addEventListener('click', () => {
+    if (gamePlaying) {
+        // add current score to Global score
+        scores[activePlayer] += roundScore;
+        //update the UI
+        document.getElementById(`score-${activePlayer}`).textContent = scores[activePlayer];
+        // check if player won the game
+        if (scores[activePlayer] >= 10) {
+            // Current player Won
+            document.querySelector('.dice').style.display = 'none';
+            document.querySelector(`#name-${activePlayer}`).textContent = 'winner!';
+            document.querySelector(`.player-${activePlayer}-panel`).classList.add('winner');
+            document.querySelector(`.player-${activePlayer}-panel`).classList.remove('active');
+            gamePlaying = false;
+        } else {
+            // Nextplayer
+            nextPlayer();
+        }
     }
 })
 
-function nextPlayer() {
+nextPlayer = () => {
     activePlayer === 0 ? activePlayer = 1 : activePlayer = 0;
     roundScore = 0;
     document.getElementById(`current-0`).textContent = '0';
